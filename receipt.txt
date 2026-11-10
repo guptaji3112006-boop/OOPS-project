@@ -1,0 +1,16 @@
+=============== E-SHOP BILL ===============
+Date: 2026-11-10 18:32:42
+Customer: Ratnesh gupta
+Phone:    7428553851
+Email:    sfsfs
+--------------------------------------------
+Product                    Qty       Price
+press                        2     1700.00
+jeans                        3     1800.00
+--------------------------------------------
+Subtotal:                       ₹3500.00
+Discount (SAVE20 coupon):          -₹700.00
+TOTAL:                         ₹2800.00
+Card:                           ****4242
+============================================
+Thank you, Ratnesh gupta! Visit us again.
