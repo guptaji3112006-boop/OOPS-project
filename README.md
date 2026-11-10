@@ -1,202 +1,287 @@
-# E-Shop Shopping Application
+# E-Shop Web Version
 
-## Overview
+## 1. Introduction
 
-This is a console-based C++ shopping application. It allows an administrator to manage products and allows customers to add products to a cart, calculate totals, apply discounts, validate a test card number, and generate a receipt.
+This project provides a web interface for the original C++ shopping application. The browser frontend communicates with a native C++ HTTP server, so the catalog, cart calculations, discount rules, Luhn card validation, and receipt generation remain implemented in C++.
 
-The project demonstrates object-oriented programming concepts including inheritance, polymorphism, dynamic memory, classes, encapsulation, file handling, and exception handling.
+The web version is a local full-stack application:
 
-## Main Features
-
-- Admin product management
-  - Add electronics and clothing products.
-  - Delete products by ID.
-  - Display all products.
-  - Prevent duplicate product IDs.
-  - Validate product type and price.
-- Customer shopping
-  - View the catalog.
-  - Add products to a cart.
-  - Add quantities for each product.
-  - Automatically combine repeated products in the cart.
-  - Calculate subtotal and final total.
-- Discounts
-  - `SAVE10` gives 10% off.
-  - `SAVE20` gives 20% off for orders of ₹1000 or more.
-  - Orders of ₹500 or more automatically receive 10% off.
-  - Orders of ₹1000 or more automatically receive 15% off when no higher coupon applies.
-- Checkout and billing
-  - Ask for customer name, phone number, and email.
-  - Validate required customer details.
-  - Validate a 16-digit card number using the Luhn algorithm.
-  - Store only the last four card digits in the receipt.
-  - Generate a detailed `receipt.txt` file with date, customer data, items, quantities, discount, and total.
-- Edge-case handling
-  - Show a message when inventory is empty.
-  - Reject empty customer details.
-  - Reject invalid card numbers.
-  - Reject invalid product types, duplicate IDs, invalid prices, and invalid quantities.
-
-## Project Files
-
-| File | Purpose |
-|---|---|
-| `main.cpp` | Main menu, admin flow, customer flow, checkout, and card validation. |
-| `BaseProduct.h` | Abstract base product class containing common product data. |
-| `Electronics.h` | Electronics product type with warranty information. |
-| `Clothing.h` | Clothing product type with size information. |
-| `Manager.h` | Declaration of catalog management operations. |
-| `Manager.cpp` | Product catalog storage, loading, saving, adding, and deleting. |
-| `ShoppingCart.h` | Cart items, quantities, subtotal, discounts, and final total. |
-| `BillGenerator.h` | Receipt creation and customer information structure. |
-| `WebServer.cpp` | Native C++ HTTP server and JSON API for the browser application. |
-| `web/index.html` | Web storefront layout. |
-| `web/styles.css` | Responsive storefront styling. |
-| `web/app.js` | Browser cart, discounts, admin form, and API calls. |
-| `User.h` | User, customer, and admin class definitions for future extension. |
-| `catalog.txt` | Persistent product catalog data. |
-| `receipt.txt` | Receipt generated after a successful checkout. |
-
-## Requirements
-
-- Windows, Linux, or macOS.
-- A C++ compiler supporting C++17 or later.
-- MinGW g++, GCC, or another compatible compiler.
-
-## Build
-
-From the project directory, run:
-
-```bash
-g++ -std=c++17 -Wall -Wextra -o EShopApp main.cpp Manager.cpp
+```text
+Browser UI  ->  C++ HTTP API  ->  C++ business classes  ->  catalog.txt / receipt.txt
 ```
 
-On Windows with UTF-8 source files, this command can be used:
+## 2. Web Architecture
 
-```powershell
-g++ -std=c++17 -Wall -Wextra -finput-charset=UTF-8 -o EShopApp.exe main.cpp Manager.cpp
+### Frontend
+
+The frontend is located in the `web/` folder:
+
+- `index.html` defines the storefront layout.
+- `styles.css` provides responsive styling and the user interface design.
+- `app.js` loads products, manages the browser cart, applies visual totals, submits admin forms, and calls the C++ API.
+
+### Backend
+
+`WebServer.cpp` is a lightweight HTTP server built with Windows Winsock. It:
+
+- Listens on `localhost:8080`.
+- Serves the web files.
+- Returns products from the C++ `Manager` catalog.
+- Adds products through `Manager::addProduct()`.
+- Builds a C++ `ShoppingCart` during checkout.
+- Uses the existing discount and Luhn validation logic.
+- Generates `receipt.txt` through `BillGenerator`.
+
+No JavaScript-only checkout calculation is trusted by the backend. The server rebuilds the cart and calculates the final amount in C++ before creating the receipt.
+
+## 3. Web API
+
+### Get products
+
+```http
+GET /api/products
 ```
 
-## Web Version
+Example response:
 
-The project also includes a browser frontend connected to the C++ business logic through a small native HTTP server using Windows Winsock.
-
-Build the web server on Windows with MinGW:
-
-```powershell
-g++ -std=c++17 -Wall -Wextra -finput-charset=UTF-8 -o EShopWeb.exe WebServer.cpp Manager.cpp -lws2_32
+```json
+[
+  {"id":101,"name":"Laptop","price":55000,"type":"Product"}
+]
 ```
 
-Start it from the project directory:
+### Add product
 
-```powershell
-.\EShopWeb.exe
+```http
+POST /api/products
+Content-Type: application/json
 ```
 
-Open [http://localhost:8080](http://localhost:8080) in a browser. Keep the `web` folder beside the executable because the server loads `web/index.html`, `web/styles.css`, and `web/app.js` at runtime.
+Request data:
 
-Web API endpoints:
-
-- `GET /api/products` returns catalog products.
-- `POST /api/products` adds a product.
-- `POST /api/checkout` validates the customer/card and generates `receipt.txt`.
-
-The web interface uses the same C++ catalog, cart, discount rules, Luhn validation, and receipt generator as the console application.
-
-## Run
-
-Run the executable from the project directory:
-
-```powershell
-.\EShopApp.exe
+```json
+{
+  "type": "1",
+  "id": "101",
+  "name": "Laptop",
+  "price": "55000",
+  "extra": "12"
+}
 ```
 
-Run it from the project directory because the application uses relative paths for `catalog.txt` and `receipt.txt`.
+The backend rejects invalid product types, non-positive prices, empty names, and duplicate IDs.
 
-## Admin Workflow
+### Checkout
 
-1. Select `1` at the role-selection menu.
-2. Select `1` to add a product.
-3. Choose product type:
-   - `1` for Electronics
-   - `2` for Clothing
-4. Enter the product ID, name, and price.
-5. Enter the warranty for electronics or size for clothing.
-6. Select `2` to delete a product by ID.
-7. Select `3` to view the catalog.
+```http
+POST /api/checkout
+Content-Type: application/json
+```
 
-Products are saved to `catalog.txt` immediately after adding or deleting.
+Request data:
 
-## Customer Workflow
+```json
+{
+  "customer": {
+    "name": "Test Customer",
+    "phone": "9876543210",
+    "email": "test@example.com"
+  },
+  "card": "4242424242424242",
+  "coupon": "SAVE10",
+  "items": [
+    {"id": 101, "quantity": 2}
+  ]
+}
+```
 
-1. Select `2` at the role-selection menu.
-2. View the catalog with option `1`.
-3. Add a product with option `2` and enter its ID and quantity.
-4. Select checkout with option `3`.
-5. Enter `SAVE10`, `SAVE20`, or `NONE` as the coupon.
-6. Review the cart total.
-7. Confirm payment.
-8. Enter the customer name, phone, email, and a valid 16-digit test card number.
-9. The application generates `receipt.txt` after successful checkout.
+The backend validates the customer data and card number, recreates the cart from catalog IDs, applies the discount, and generates `receipt.txt`.
 
-## Test Card
+## 4. OOP Concepts Used
 
-Use this test number with the built-in Luhn validation:
+### Class and object
+
+Classes define the structure and behavior of application entities:
+
+- `BaseProduct` represents common product data.
+- `Electronics` and `Clothing` represent product objects.
+- `Manager` represents the product catalog.
+- `ShoppingCart` represents a customer cart.
+- `BillGenerator` represents bill creation behavior.
+- `CustomerInfo` represents receipt customer data.
+
+Objects are created and used by both the console application and `WebServer.cpp`.
+
+### Encapsulation
+
+Encapsulation keeps data private and exposes controlled methods.
+
+Examples:
+
+- Product ID, name, and price are private in `BaseProduct`.
+- The product list is private in `Manager`.
+- Cart items and discount state are private in `ShoppingCart`.
+- Code outside these classes uses methods such as `getProductById()`, `addProduct()`, `getTotal()`, and `applyDiscount()`.
+
+This prevents the web server from directly changing internal catalog or cart data.
+
+### Abstraction
+
+`BaseProduct` provides a common abstraction for all products. The rest of the application can work with a `BaseProduct*` without needing to know every product-specific implementation.
+
+`BillGenerator::generate()` also abstracts file formatting. The web server only supplies cart and customer data; it does not manually format the bill.
+
+### Inheritance
+
+The product hierarchy is:
+
+```text
+BaseProduct
+├── Electronics
+└── Clothing
+```
+
+`Electronics` inherits common product behavior and adds warranty information. `Clothing` inherits common product behavior and adds size information.
+
+### Polymorphism
+
+`BaseProduct` declares the virtual function `displayDetails()`.
+
+The derived classes override it:
+
+- `Electronics::displayDetails()` displays warranty information.
+- `Clothing::displayDetails()` displays size information.
+
+When `Manager` stores products as `BaseProduct*`, the correct derived display method is selected at runtime.
+
+### Dynamic memory and ownership
+
+The catalog stores product pointers in `Manager`. `Manager::~Manager()` deletes the products when the manager is destroyed. This demonstrates dynamic allocation and ownership management.
+
+The shopping cart stores non-owning pointers to catalog products. The cart does not delete those pointers because `Manager` owns the catalog products.
+
+### Composition
+
+`ShoppingCart` contains multiple `CartItem` values. Each `CartItem` connects a product pointer with a quantity.
+
+`BillGenerator` uses a `ShoppingCart` and `CustomerInfo` to create a receipt. These objects work together to provide checkout behavior.
+
+### Static member function
+
+`BillGenerator::generate()` is static because bill generation does not require a long-lived `BillGenerator` object. It can be called directly by both the console application and the web server.
+
+### Exception handling
+
+The console application uses exceptions for invalid payment, missing details, invalid product data, and receipt creation failures. The web server converts invalid requests into HTTP error responses such as `400 Bad Request`.
+
+### File handling
+
+- `Manager` uses `ifstream` to load `catalog.txt`.
+- `Manager` uses `ofstream` to save catalog changes.
+- `BillGenerator` uses `ofstream` to create `receipt.txt`.
+
+The web layer reuses the same file-backed C++ classes instead of creating a separate storage system.
+
+## 5. Checkout Flow
+
+```text
+1. Browser loads products
+2. User adds product and quantity
+3. Browser opens checkout form
+4. User enters name, phone, email, and test card
+5. Browser sends POST /api/checkout
+6. C++ validates required fields
+7. C++ validates the card using Luhn
+8. C++ finds each product in Manager
+9. C++ builds ShoppingCart
+10. C++ applies coupon or automatic discount
+11. C++ generates receipt.txt
+12. Browser displays payment success
+```
+
+## 6. Discount Rules
+
+- `SAVE10`: 10% discount.
+- `SAVE20`: 20% discount when subtotal is at least ₹1000.
+- Subtotal of at least ₹500: automatic 10% discount.
+- Subtotal of at least ₹1000 without a qualifying coupon: automatic 15% discount.
+
+The final discount is calculated by `ShoppingCart::applyDiscount()` and `ShoppingCart::getTotal()`.
+
+## 7. Luhn Card Validation
+
+The web server validates a 16-digit card number using the Luhn algorithm:
+
+1. Start from the rightmost digit.
+2. Double every second digit.
+3. Subtract 9 when a doubled digit is greater than 9.
+4. Add all digits.
+5. Accept the number when the total is divisible by 10.
+
+Use this test number:
 
 ```text
 4242424242424242
 ```
 
-This is not a real payment card. The application only validates the number mathematically; it does not connect to a payment gateway or process real payments.
+This is only a mathematical test number. No real payment is processed.
 
-## Catalog Format
+## 8. Build and Run
 
-The current catalog file uses comma-separated values:
+Open PowerShell in the project directory and compile:
 
-```text
-101,Laptop,55000
-102,Shirt,1200
+```powershell
+g++ -std=c++17 -Wall -Wextra -finput-charset=UTF-8 -o EShopWeb.exe WebServer.cpp Manager.cpp -lws2_32
 ```
 
-The current loader recreates loaded products as electronics with a default 12-month warranty. If preserving product type, clothing size, or warranty across restarts is required, the catalog format should be extended with a product-type field.
+Start the server:
 
-## Receipt Contents
+```powershell
+.\EShopWeb.exe
+```
 
-The generated receipt includes:
+Open the application at:
 
-- Date and time.
-- Customer name, phone, and email.
-- Product names and quantities.
-- Subtotal.
-- Discount name and amount.
-- Final total in rupees.
-- Masked card number showing only the last four digits.
-- Thank-you greeting.
+```text
+http://localhost:8080
+```
 
-## OOP Concepts Used
+The `web/` folder must remain beside the executable. The server reads `catalog.txt`, `web/index.html`, `web/styles.css`, and `web/app.js` using relative paths.
 
-- Abstraction through `BaseProduct`.
-- Inheritance through `Electronics` and `Clothing`.
-- Runtime polymorphism through `displayDetails()`.
-- Encapsulation through private product and cart data.
-- Dynamic memory using product pointers managed by `Manager`.
-- File handling using `ifstream` and `ofstream`.
-- Exception handling for invalid checkout and product input.
+## 9. Web File Responsibilities
 
-## Current Limitations
+| File | Responsibility |
+|---|---|
+| `WebServer.cpp` | HTTP server, API routing, request validation, C++ checkout orchestration. |
+| `web/index.html` | Product catalog, cart, admin form, checkout form. |
+| `web/styles.css` | Layout, colors, cards, responsive design, modal form. |
+| `web/app.js` | API requests, cart display, quantity controls, coupon input, user messages. |
+| `Manager.*` | Catalog storage and product lookup. |
+| `ShoppingCart.h` | Cart quantities, subtotal, discounts, and total. |
+| `BillGenerator.h` | Receipt formatting and customer information. |
 
-- Product names cannot contain spaces because input uses `cin >> name`.
-- Inventory does not track stock quantities.
-- Product type information is not preserved in the current catalog file format.
-- The checkout validates card format only and does not process real payments.
-- `receipt.txt` is overwritten after each successful checkout.
+## 10. Current Limitations
 
-## Future Improvements
+- The web server is designed for local development, not production deployment.
+- It uses a simple manual JSON parser and should be replaced with a proper JSON library for production.
+- The server is single-threaded.
+- There is no login or admin authentication.
+- There is no stock quantity tracking.
+- Product-specific warranty and clothing size are not fully serialized in the current API response.
+- `receipt.txt` is overwritten by each new checkout.
+- The payment system validates card format only and does not connect to a payment gateway.
 
-- Add stock quantity and prevent overselling.
-- Store product type, warranty, and clothing size in `catalog.txt`.
-- Support product names with spaces.
-- Add separate receipt files with unique invoice numbers.
-- Add real database storage.
-- Integrate a secure payment provider for production use.
-- Add automated unit tests for cart totals, discounts, and Luhn validation.
+## 11. Future Improvements
+
+- Add a proper JSON library such as nlohmann/json.
+- Add HTTPS and authentication.
+- Add admin login and protected product APIs.
+- Use a database instead of plain text files.
+- Add inventory quantity and stock validation.
+- Add unique invoice numbers and separate receipt files.
+- Add automated tests for API routes, discounts, cart quantities, and Luhn validation.
+- Add a production HTTP framework such as Crow or Drogon.
+
+### Luhn Algorithm Used:
+
+The system features a secure payment gateway simulation powered by the Luhn Algorithm (also known as the Mod 10 algorithm). This is the industry-standard checksum formula used worldwide by financial institutions to validate credit card numbers, IMEI numbers, and other sensitive identification strings.
