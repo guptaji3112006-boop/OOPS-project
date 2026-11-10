@@ -281,3 +281,7 @@ The `web/` folder must remain beside the executable. The server reads `catalog.t
 - Add unique invoice numbers and separate receipt files.
 - Add automated tests for API routes, discounts, cart quantities, and Luhn validation.
 - Add a production HTTP framework such as Crow or Drogon.
+
+### Luhn Algorithm Used:
+
+The system features a secure payment gateway simulation powered by the Luhn Algorithm (also known as the Mod 10 algorithm). This is the industry-standard checksum formula used worldwide by financial institutions to validate credit card numbers, IMEI numbers, and other sensitive identification strings.
