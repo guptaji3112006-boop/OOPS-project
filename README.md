@@ -49,6 +49,10 @@ The project demonstrates object-oriented programming concepts including inherita
 | `Manager.cpp` | Product catalog storage, loading, saving, adding, and deleting. |
 | `ShoppingCart.h` | Cart items, quantities, subtotal, discounts, and final total. |
 | `BillGenerator.h` | Receipt creation and customer information structure. |
+| `WebServer.cpp` | Native C++ HTTP server and JSON API for the browser application. |
+| `web/index.html` | Web storefront layout. |
+| `web/styles.css` | Responsive storefront styling. |
+| `web/app.js` | Browser cart, discounts, admin form, and API calls. |
 | `User.h` | User, customer, and admin class definitions for future extension. |
 | `catalog.txt` | Persistent product catalog data. |
 | `receipt.txt` | Receipt generated after a successful checkout. |
@@ -72,6 +76,32 @@ On Windows with UTF-8 source files, this command can be used:
 ```powershell
 g++ -std=c++17 -Wall -Wextra -finput-charset=UTF-8 -o EShopApp.exe main.cpp Manager.cpp
 ```
+
+## Web Version
+
+The project also includes a browser frontend connected to the C++ business logic through a small native HTTP server using Windows Winsock.
+
+Build the web server on Windows with MinGW:
+
+```powershell
+g++ -std=c++17 -Wall -Wextra -finput-charset=UTF-8 -o EShopWeb.exe WebServer.cpp Manager.cpp -lws2_32
+```
+
+Start it from the project directory:
+
+```powershell
+.\EShopWeb.exe
+```
+
+Open [http://localhost:8080](http://localhost:8080) in a browser. Keep the `web` folder beside the executable because the server loads `web/index.html`, `web/styles.css`, and `web/app.js` at runtime.
+
+Web API endpoints:
+
+- `GET /api/products` returns catalog products.
+- `POST /api/products` adds a product.
+- `POST /api/checkout` validates the customer/card and generates `receipt.txt`.
+
+The web interface uses the same C++ catalog, cart, discount rules, Luhn validation, and receipt generator as the console application.
 
 ## Run
 

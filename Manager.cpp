@@ -71,3 +71,7 @@ BaseProduct* Manager::getProductById(int id) {
     }
     return nullptr;
 }
+
+const vector<BaseProduct*>& Manager::getProducts() const {
+    return catalog;
+}

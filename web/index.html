@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-Shop</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <small>C++ POWERED STOREFRONT</small>
+        <h1>E-Shop</h1>
+        <p>Simple shopping, transparent totals.</p>
+      </div>
+      <button id="adminToggle">Admin</button>
+    </header>
+    <main class="layout">
+      <section>
+        <div class="heading">
+          <div>
+            <small>CATALOG</small>
+            <h2>Browse products</h2>
+          </div>
+          <button id="refresh">Refresh</button>
+        </div>
+        <div id="catalog" class="products">Loading catalog...</div>
+      </section>
+      <aside class="cart">
+        <div class="heading">
+          <h2>Your cart</h2>
+          <span id="cartCount">0 items</span>
+        </div>
+        <div id="cartItems"></div>
+        <div class="totals">
+          <span>Subtotal</span><b id="subtotal">₹0.00</b><span>Discount</span
+          ><b id="discount">-₹0.00</b><strong>Total</strong
+          ><strong id="total">₹0.00</strong>
+        </div>
+        <label>Coupon<input id="coupon" placeholder="SAVE10 or SAVE20" /></label
+        ><button id="checkout" class="primary full">Checkout</button>
+      </aside>
+    </main>
+    <section id="admin" class="admin hidden">
+      <h2>Add product</h2>
+      <form id="productForm">
+        <input
+          name="type"
+          type="number"
+          min="1"
+          max="2"
+          placeholder="Type 1 or 2"
+          required
+        /><input
+          name="id"
+          type="number"
+          placeholder="Product ID"
+          required
+        /><input name="name" placeholder="Product name" required /><input
+          name="price"
+          type="number"
+          min="1"
+          step=".01"
+          placeholder="Price ₹"
+          required
+        /><input name="extra" placeholder="Warranty or size" required /><button
+          class="primary"
+        >
+          Add product
+        </button>
+      </form>
+    </section>
+    <div id="modal" class="modal hidden">
+      <form id="checkoutForm" class="dialog">
+        <button type="button" id="closeModal" class="close">×</button>
+        <h2>Complete checkout</h2>
+        <input name="name" placeholder="Your name" required /><input
+          name="phone"
+          placeholder="Phone number"
+          required
+        /><input name="email" type="email" placeholder="Email" required /><input
+          name="card"
+          inputmode="numeric"
+          maxlength="16"
+          placeholder="16-digit test card"
+          required
+        /><small>Test card: 4242424242424242</small
+        ><button class="primary full">Pay securely</button>
+      </form>
+    </div>
+    <div id="message"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,199 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #18221d;
+  background: #f5f6f1;
+  --green: #1b5e45;
+  --cream: #fffdf7;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+header {
+  background: #183b2e;
+  color: #fff;
+  padding: 38px max(24px, calc((100% - 1180px) / 2));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header h1 {
+  font-size: 4rem;
+  margin: 0;
+}
+header p {
+  color: #cfe2d7;
+}
+header small,
+.heading small {
+  color: #d19a54;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+button,
+input {
+  font: inherit;
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 1px solid #cbd5cb;
+  background: #fff;
+  cursor: pointer;
+}
+.layout {
+  max-width: 1180px;
+  margin: 36px auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 36px;
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+h2 {
+  margin: 0;
+}
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.card,
+.cart,
+.admin,
+.dialog {
+  background: var(--cream);
+  border: 1px solid #e0e6dc;
+  border-radius: 18px;
+  box-shadow: 0 12px 35px #183b2e0b;
+}
+.card {
+  padding: 20px;
+}
+.card h3 {
+  margin: 10px 0;
+}
+.price {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.card button {
+  margin-top: 16px;
+  width: 100%;
+}
+.cart {
+  padding: 24px;
+  align-self: start;
+  position: sticky;
+  top: 20px;
+}
+.cart-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e9e2;
+}
+.qty {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.qty button {
+  padding: 2px 9px;
+}
+.totals {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  margin: 20px 0;
+}
+.totals strong {
+  font-size: 1.2rem;
+  padding-top: 12px;
+  border-top: 1px solid #d8ded6;
+}
+.cart label {
+  display: block;
+}
+.cart input {
+  display: block;
+  width: 100%;
+  margin: 6px 0 12px;
+}
+.primary {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+.full {
+  width: 100%;
+}
+.admin {
+  max-width: 1180px;
+  margin: 0 auto 36px;
+  padding: 24px;
+}
+.admin form {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.hidden {
+  display: none !important;
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  background: #10261caa;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.dialog {
+  width: min(420px, 100%);
+  padding: 28px;
+  display: grid;
+  gap: 12px;
+  position: relative;
+}
+.close {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  border: 0;
+  background: transparent;
+  font-size: 1.5rem;
+}
+.dialog small {
+  color: #69766d;
+}
+#message {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #183b2e;
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: 10px;
+}
+#message.show {
+  display: block;
+}
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .cart {
+    position: static;
+  }
+  .admin form {
+    grid-template-columns: 1fr;
+  }
+}

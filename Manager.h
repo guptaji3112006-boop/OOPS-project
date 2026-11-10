@@ -15,6 +15,7 @@ public:
     void saveData(); 
     void loadData();
     BaseProduct* getProductById(int id);
+    const std::vector<BaseProduct*>& getProducts() const;
     double calculateTotal() const;
     bool isEmpty() const;
 };
