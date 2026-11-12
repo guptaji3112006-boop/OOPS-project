@@ -1,3 +1,3 @@
-101,press,850
-201,jeans,600
-11,tv,20000
+Electronics|101|press|850.00|12
+Clothing|201|jeans|600.00|M
+Electronics|11|tv|20000.00|12
