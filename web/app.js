@@ -73,8 +73,13 @@ document.querySelector("#coupon").oninput = (e) => {
   renderCart();
 };
 document.querySelector("#refresh").onclick = loadProducts;
-document.querySelector("#adminToggle").onclick = () =>
-  document.querySelector("#admin").classList.toggle("hidden");
+   document.querySelector("#adminToggle").onclick = () => {
+     const admin = document.querySelector("#admin");
+     admin.classList.toggle("hidden");
+     if (!admin.classList.contains("hidden")) {
+       admin.scrollIntoView({ behavior: "smooth", block: "center" });
+     }
+   };
 document.querySelector("#closeModal").onclick = () =>
   document.querySelector("#modal").classList.add("hidden");
 document.querySelector("#checkout").onclick = () => {
