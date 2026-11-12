@@ -1,6 +1,9 @@
 #ifndef SHOPPINGCART_H
 #define SHOPPINGCART_H
 
+#include <algorithm>
+#include <cctype>
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -15,8 +18,31 @@ struct CartItem {
 class ShoppingCart {
 private:
     std::vector<CartItem> items;
-    double discountPercent = 0.0;
-    std::string discountName = "No discount";
+    std::string coupon;
+
+    struct Discount {
+        double percent;
+        std::string name;
+    };
+
+    static std::string normalize(const std::string& s) {
+        size_t start = 0, end = s.size();
+        while (start < end && std::isspace(static_cast<unsigned char>(s[start]))) ++start;
+        while (end > start && std::isspace(static_cast<unsigned char>(s[end - 1]))) --end;
+        std::string out = s.substr(start, end - start);
+        std::transform(out.begin(), out.end(), out.begin(),
+                       [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+        return out;
+    }
+
+    Discount computeDiscount() const {
+        const double subtotal = getSubtotal();
+        if (coupon == "SAVE10") return {10.0, "SAVE10 coupon"};
+        if (coupon == "SAVE20" && subtotal >= 1000.0) return {20.0, "SAVE20 coupon"};
+        if (subtotal >= 1000.0) return {15.0, "Automatic 15% discount"};
+        if (subtotal >= 500.0) return {10.0, "Automatic 10% discount"};
+        return {0.0, "No discount"};
+    }
 
 public:
     void addProduct(BaseProduct* product, int quantity = 1) {
@@ -43,36 +69,20 @@ public:
         return subtotal;
     }
 
-    void applyDiscount(const std::string& coupon) {
-        const double subtotal = getSubtotal();
-        discountPercent = 0.0;
-        discountName = "No discount";
+    // Coupon yaad rakhta hai; discount har baar taaza hisaab se nikalta hai.
+    void applyDiscount(const std::string& c) { coupon = normalize(c); }
 
-        if (coupon == "SAVE10") {
-            discountPercent = 10.0;
-            discountName = "SAVE10 coupon";
-        } else if (coupon == "SAVE20" && subtotal >= 1000.0) {
-            discountPercent = 20.0;
-            discountName = "SAVE20 coupon";
-        } else if (subtotal >= 1000.0) {
-            discountPercent = 15.0;
-            discountName = "Automatic 15% discount";
-        } else if (subtotal >= 500.0) {
-            discountPercent = 10.0;
-            discountName = "Automatic 10% discount";
-        }
-    }
+    double getDiscountPercent() const { return computeDiscount().percent; }
+    std::string getDiscountName() const { return computeDiscount().name; }
 
     double getDiscountAmount() const {
-        return getSubtotal() * discountPercent / 100.0;
+        double amount = getSubtotal() * computeDiscount().percent / 100.0;
+        return std::round(amount * 100.0) / 100.0;
     }
 
     double getTotal() const {
         return getSubtotal() - getDiscountAmount();
     }
-
-    double getDiscountPercent() const { return discountPercent; }
-    std::string getDiscountName() const { return discountName; }
 
     void display() const {
         std::cout << "\n--- YOUR CART ---\n";
@@ -82,15 +92,14 @@ public:
                       << item.product->getPrice() * item.quantity << "\n";
         }
         std::cout << "Subtotal: ₹" << getSubtotal() << "\n"
-                  << "Discount (" << discountName << "): -₹"
+                  << "Discount (" << getDiscountName() << "): -₹"
                   << getDiscountAmount() << "\n"
                   << "Total: ₹" << getTotal() << "\n";
     }
 
     void clear() {
         items.clear();
-        discountPercent = 0.0;
-        discountName = "No discount";
+        coupon.clear();
     }
 };
 
