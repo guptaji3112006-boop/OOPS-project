@@ -11,17 +11,18 @@ private:
     double price;
 
 public:
-    BaseProduct(int i, std::string n, double p) : id(i), name(n), price(p) {}
+    BaseProduct(int i, const std::string& n, double p) : id(i), name(n), price(p) {}
     virtual ~BaseProduct() {}
 
-   
-    virtual void displayDetails() = 0; 
+    virtual void displayDetails() const = 0;
+    virtual std::string getType() const = 0;   // "Electronics" / "Clothing"
+    virtual std::string getExtra() const = 0;  // warranty ya size, text me
 
     int getId() const { return id; }
-    std::string getName() const { return name; }
+    const std::string& getName() const { return name; }
     double getPrice() const { return price; }
-    void setPrice(double p) { if (p >= 0) price = p; }
-    void setName(std::string n) { name = n; }
+    void setPrice(double p) { if (p > 0) price = p; }
+    void setName(const std::string& n) { if (!n.empty()) name = n; }
 };
 
 #endif

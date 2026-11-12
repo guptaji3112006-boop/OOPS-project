@@ -6,17 +6,23 @@
 
 class Manager {
 private:
-    std::vector<BaseProduct*> catalog; 
+    std::vector<BaseProduct*> catalog;
 public:
-    ~Manager(); 
-    void addProduct(BaseProduct* p);
-    void displayAll() const; 
-    void deleteProduct(int id);
-    void saveData(); 
+    Manager() = default;
+    Manager(const Manager&) = delete;
+    Manager& operator=(const Manager&) = delete;
+    ~Manager();
+
+    bool addProduct(BaseProduct* p);
+    void displayAll() const;
+    bool deleteProduct(int id);
+    bool saveData() const;
     void loadData();
     BaseProduct* getProductById(int id);
+    const BaseProduct* getProductById(int id) const;
     const std::vector<BaseProduct*>& getProducts() const;
-    double calculateTotal() const;
+    double getInventoryValue() const;
+    double calculateTotal() const { return getInventoryValue(); }
     bool isEmpty() const;
 };
 #endif

@@ -8,12 +8,16 @@ private:
     std::string size;
 
 public:
-    Clothing(int i, std::string n, double p, std::string s) : BaseProduct(i, n, p), size(s) {}
+    Clothing(int i, const std::string& n, double p, const std::string& s)
+        : BaseProduct(i, n, p), size(s) {}
 
-    void displayDetails() override
+    void displayDetails() const override
     {
         std::cout << "[Clothing] ID: " << getId() << " | Name: " << getName()
                   << " | Price: ₹" << getPrice() << " | Size: " << size << std::endl;
     }
+
+    std::string getType() const override { return "Clothing"; }
+    std::string getExtra() const override { return size; }
 };
 #endif

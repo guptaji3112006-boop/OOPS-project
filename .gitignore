@@ -1,0 +1,4 @@
+*.exe
+*.o
+receipt.txt
+.vscode/
