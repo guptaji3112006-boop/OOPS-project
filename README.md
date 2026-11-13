@@ -46,7 +46,20 @@ Example response:
 
 ```json
 [
-  {"id":101,"name":"Laptop","price":55000,"type":"Product"}
+  {
+    "id": 101,
+    "name": "Laptop",
+    "price": 55000,
+    "type": "Electronics",
+    "warranty": 24
+  },
+  {
+    "id": 103,
+    "name": "Jeans",
+    "price": 1800,
+    "type": "Clothing",
+    "size": "32"
+  }
 ]
 ```
 
@@ -68,6 +81,8 @@ Request data:
   "extra": "12"
 }
 ```
+
+Product types supported: `1` for Electronics (with warranty in months as `extra`), and `2` for Clothing (with size e.g. M, L, XL as `extra`).
 
 The backend rejects invalid product types, non-positive prices, empty names, and duplicate IDs.
 
@@ -252,24 +267,23 @@ The `web/` folder must remain beside the executable. The server reads `catalog.t
 
 | File | Responsibility |
 |---|---|
-| `WebServer.cpp` | HTTP server, API routing, request validation, C++ checkout orchestration. |
-| `web/index.html` | Product catalog, cart, admin form, checkout form. |
-| `web/styles.css` | Layout, colors, cards, responsive design, modal form. |
-| `web/app.js` | API requests, cart display, quantity controls, coupon input, user messages. |
-| `Manager.*` | Catalog storage and product lookup. |
-| `ShoppingCart.h` | Cart quantities, subtotal, discounts, and total. |
-| `BillGenerator.h` | Receipt formatting and customer information. |
+| `WebServer.cpp` | HTTP server, API routing, request validation, serialized product types/extra attributes, C++ checkout orchestration. |
+| `web/index.html` | Product catalog with badges/attributes, shopping cart, admin product creation form with dynamic type selector, checkout modal. |
+| `web/styles.css` | Layout, styling, product badges, responsive design, modal and alert formatting. |
+| `web/app.js` | API requests, cart management, HTML escaping/sanitization, dynamic attribute inputs, checkout processing, and user error alerts. |
+| `Manager.*` | Catalog persistence with type tagging (`catalog.txt`), dynamic product instantiation, validation. |
+| `ShoppingCart.h` | Cart management, coupon normalization, rounding discount logic, and totals. |
+| `BillGenerator.h` | Receipt formatting with aligned tabular columns, safe credit card masking, and write error handling. |
 
 ## 10. Current Limitations
 
 - The web server is designed for local development, not production deployment.
-- It uses a simple manual JSON parser and should be replaced with a proper JSON library for production.
+- It uses a lightweight manual JSON parser and should be replaced with a full JSON library for production.
 - The server is single-threaded.
 - There is no login or admin authentication.
-- There is no stock quantity tracking.
-- Product-specific warranty and clothing size are not fully serialized in the current API response.
+- There is no inventory stock quantity tracking.
 - `receipt.txt` is overwritten by each new checkout.
-- The payment system validates card format only and does not connect to a payment gateway.
+- The payment system validates card format only using Luhn algorithm and does not connect to an external payment gateway.
 
 ## 11. Future Improvements
 
