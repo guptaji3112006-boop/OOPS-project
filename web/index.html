@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>E-Shop</title>
     <link rel="stylesheet" href="/styles.css" />
+    <style>
+      #productForm select {
+        font: inherit;
+        padding: 14px 16px;
+        border: 1px solid #d8d8d0;
+        border-radius: 12px;
+        background: #fff;
+        color: inherit;
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -44,26 +54,28 @@
     <section id="admin" class="admin hidden">
       <h2>Add product</h2>
       <form id="productForm">
-        <input
-          name="type"
-          type="number"
-          min="1"
-          max="2"
-          placeholder="Type 1 or 2"
-          required
-        /><input
+        <select name="type" required>
+          <option value="1">Electronics</option>
+          <option value="2">Clothing</option></select
+        ><input
           name="id"
           type="number"
+          min="1"
           placeholder="Product ID"
           required
-        /><input name="name" placeholder="Product name" required /><input
+        /><input
+          name="name"
+          maxlength="60"
+          placeholder="Product name"
+          required
+        /><input
           name="price"
           type="number"
-          min="1"
+          min="0.01"
           step=".01"
           placeholder="Price ₹"
           required
-        /><input name="extra" placeholder="Warranty or size" required /><button
+        /><input name="extra" placeholder="Warranty (months)" /><button
           class="primary"
         >
           Add product
